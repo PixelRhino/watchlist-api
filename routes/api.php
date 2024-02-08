@@ -35,10 +35,10 @@ Route::group([
   'middleware' => 'api'
 ], function () {
   Route::get('watchlists', [WatchlistController::class, 'watchlists']);
-  Route::get('watchlists/{watchlist}', [WatchlistController::class, 'watchlist']);
+  Route::get('watchlists/{id}', [WatchlistController::class, 'watchlist']);
   Route::post('watchlists', [WatchlistController::class, 'store']);
-  Route::post('watchlists/{watchlist}/update', [WatchlistController::class, 'update']);
-  Route::post('watchlists/{watchlist}/delete', [WatchlistController::class, 'delete']);
+  Route::post('watchlists/{id}/update', [WatchlistController::class, 'update']);
+  Route::post('watchlists/{id}/delete', [WatchlistController::class, 'delete']);
 });
 
 

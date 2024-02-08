@@ -7,13 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $name
+ * @property int $public
+ * @property int $created_at
+ * @property int $updated_at
+ * @property User $user
+ */
+
 class Watchlist extends Model
 {
     use HasFactory;
 
     protected $fillable = ["name"];
 
-//    protected $hidden = ["user_id"];
+    protected $hidden = ["user_id", "user"];
 
     protected $casts = [
       "created_at" => 'datetime',

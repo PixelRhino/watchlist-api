@@ -22,12 +22,21 @@ class WatchlistController extends Controller
         /** @var $user User */
         $user = auth()->user();
 
-        return $user->watchlists()->paginate(1);
+        return $user->watchlists()->paginate(25);
     }
 
-    public function watchlist(Watchlist $watchlist): Watchlist
+    public function watchlist(int $id): Watchlist|JsonResponse
     {
-        return $watchlist;
+        /** @var $user User */
+        $user = auth()->user();
+
+        $watchlist = $user->watchlists()->find($id);
+
+        if(!$watchlist){
+            return response()->json(['error' => 'Watchlist does not exist'], 404);
+        }
+
+        return response()->json($watchlist);
     }
 
     public function store(Request $request): Model|JsonResponse
@@ -46,13 +55,16 @@ class WatchlistController extends Controller
         return $user->watchlists()->create($validator->validated());
     }
 
-    public function update(Watchlist $watchlist, Request $request)
+    public function update(int $id, Request $request): JsonResponse
     {
         /** @var $user User */
         $user = auth()->user();
 
-        if($watchlist->user()->id !== $user->id){
-            return response()->json(['error' => 'Invalid action'], 403);
+        /** @var $watchlist Watchlist */
+        $watchlist = $user->watchlists()->find($id);
+
+        if(!$watchlist){
+            return response()->json(['error' => 'Watchlist does not exist'], 404);
         }
 
         $validator = Validator::make($request->all(), [
@@ -70,20 +82,23 @@ class WatchlistController extends Controller
         return response()->json($watchlist);
     }
 
-    public function delete(Watchlist $watchlist): JsonResponse
+    public function delete(int $id): JsonResponse
     {
         /** @var $user User */
         $user = auth()->user();
 
-        if($watchlist->user->id !== $user->id){
-            return response()->json(['error' => 'Invalid action'], 403);
+        /** @var $watchlist Watchlist */
+        $watchlist = $user->watchlists()->find($id);
+
+        if(!$watchlist){
+            return response()->json(['error' => 'Watchlist does not exist'], 404);
         }
 
         if(!$watchlist->delete()){
             return response()->json(['error' => 'Watchlist could not be deleted'], 500);
         }
 
-        return response()->json([]);
+        return response()->json(status: 204);
     }
 
 
