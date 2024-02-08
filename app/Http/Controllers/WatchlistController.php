@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Watchlist;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,29 +16,29 @@ class WatchlistController extends Controller
         $this->middleware('auth:api');
     }
 
-    public function watchlists(): LengthAwarePaginator
+    public function watchlists(): JsonResponse
     {
         /** @var $user User */
         $user = auth()->user();
 
-        return $user->watchlists()->paginate(25);
+        return response()->json($user->watchlists()->paginate(25));
     }
 
-    public function watchlist(int $id): Watchlist|JsonResponse
+    public function watchlist(int $watchlist_id): JsonResponse
     {
         /** @var $user User */
         $user = auth()->user();
 
-        $watchlist = $user->watchlists()->find($id);
+        $watchlist = $user->watchlists()->with('items')->find($watchlist_id);
 
         if(!$watchlist){
-            return response()->json(['error' => 'Watchlist does not exist'], 404);
+            return response()->json(['message' => 'Watchlist does not exist'], 404);
         }
 
         return response()->json($watchlist);
     }
 
-    public function store(Request $request): Model|JsonResponse
+    public function store(Request $request): JsonResponse
     {
         /** @var $user User */
         $user = auth()->user();
@@ -49,19 +48,21 @@ class WatchlistController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 500);
+            return response()->json($validator->errors(), 400);
         }
 
-        return $user->watchlists()->create($validator->validated());
+        $watchlist = $user->watchlists()->create($validator->validated());
+
+        return response()->json($watchlist, 201);
     }
 
-    public function update(int $id, Request $request): JsonResponse
+    public function update(int $watchlist_id, Request $request): JsonResponse
     {
         /** @var $user User */
         $user = auth()->user();
 
         /** @var $watchlist Watchlist */
-        $watchlist = $user->watchlists()->find($id);
+        $watchlist = $user->watchlists()->find($watchlist_id);
 
         if(!$watchlist){
             return response()->json(['error' => 'Watchlist does not exist'], 404);
@@ -72,30 +73,30 @@ class WatchlistController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 500);
+            return response()->json($validator->errors(), 400);
         }
 
         if(!$watchlist->update($validator->validated())){
-            return response()->json(['error' => 'Watchlist could not be updated'], 500);
+            return response()->json(['message' => 'Watchlist could not be updated'], 500);
         }
 
         return response()->json($watchlist);
     }
 
-    public function delete(int $id): JsonResponse
+    public function delete(int $watchlist_id): JsonResponse
     {
         /** @var $user User */
         $user = auth()->user();
 
         /** @var $watchlist Watchlist */
-        $watchlist = $user->watchlists()->find($id);
+        $watchlist = $user->watchlists()->find($watchlist_id);
 
         if(!$watchlist){
-            return response()->json(['error' => 'Watchlist does not exist'], 404);
+            return response()->json(['message' => 'Watchlist does not exist'], 404);
         }
 
         if(!$watchlist->delete()){
-            return response()->json(['error' => 'Watchlist could not be deleted'], 500);
+            return response()->json(['message' => 'Watchlist could not be deleted'], 500);
         }
 
         return response()->json(status: 204);

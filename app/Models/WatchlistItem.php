@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @property int $id
+ * @property int $watchlist_id
+ * @property int $media_id
+ * @property int $name
+ * @property int $season
+ * @property int $episode
+ * @property int $created_at
+ * @property int $updated_at
+ * @property Watchlist $watchlist
+ */
+
 class WatchlistItem extends Model
 {
     use HasFactory;
@@ -17,6 +29,11 @@ class WatchlistItem extends Model
       "name",
       "season",
       "episode",
+    ];
+
+    protected $casts = [
+        "season" => 'integer',
+        "episode" => 'integer',
     ];
 
     public function watchlist(): BelongsTo
