@@ -28,7 +28,6 @@ Route::group([
     Route::get('me',        [AuthController::class, 'me']);
 });
 
-
 Route::group([
     'middleware' => 'api'
 ], function () {
